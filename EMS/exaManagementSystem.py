@@ -62,7 +62,7 @@ class ExaManagementSystem:
         
         smsConfig = ConfigParser.SafeConfigParser()
         self.__log.debug("Reading general configuration from lecture.cfg")
-        smsConfig.read([join(self.__CONFIG_DIR, 'exam.cfg'), "exam.cfg"])
+        smsConfig.read([join(resource_filename(__name__, 'data'), 'exam.cfg'), "exam.cfg"])
         #Read the config options
         self.__smscExamOutputDir = smsConfig.get("Config", "examOutputDir")
         self.__smscremoveUnzipped = smsConfig.getboolean("Config", "removeUnzipped")

@@ -35,7 +35,7 @@ def read(fname):
 
 setup(
     name="exaManagementSystem",
-    version="1.1",
+    version="1.1.12",
     author="Andreas Ruppen",
     author_email="andreas.ruppen@gmail.com",
     description="Manages Series",
@@ -64,7 +64,6 @@ setup(
         'Topic :: Software Development :: Compilers',
         "License :: OSI Approved :: Apache Software License",
         'Operating System :: MacOS :: MacOS X',
-        'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
