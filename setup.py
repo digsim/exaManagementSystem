@@ -41,7 +41,7 @@ setup(
     description="Manages Series",
     license="Apache",
     keywords="students series",
-    url="https://github.com/digsim/seriesManagementSystem",
+    url="https://github.com/digsim/exaManagementSystem",
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     package_data = package_data,
     entry_points={
