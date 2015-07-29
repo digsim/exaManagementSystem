@@ -46,17 +46,17 @@ To clean the working directory
 
 First find the installed package with pip and the uninstall it
 
-    ~/SMS [master|✚ 1…1] 
-    12:13 $ pip freeze |grep Series*
-    4:Series-Management-System==1.1
-    ~/SMS [master|✚ 1…1] 
-    12:13 $ sudo pip uninstall Series-Management-System
-    Uninstalling Series-Management-System:
-      /Library/Python/2.7/site-packages/Series_Management_System-1.1-py2.7.egg
-      /usr/local/bin/seriesManagementSystem
+    ~/EMS [master|✚ 1…1] 
+    12:13 $ pip freeze |grep exaManagementSystem
+    exaManagementSystem==1.1
+    ~/EMS [master|✚ 1…1] 
+    12:13 $ sudo pip uninstall exaManagementSystem
+    Uninstalling exaManagementSystem:
+      /Library/Python/2.7/site-packages/exaManagementSystem-1.1-py2.7.egg
+      /usr/local/bin/examanagementsystem
     Proceed (y/n)? y
-        Successfully uninstalled Series-Management-System
-     ~/SMS [master|✚ 1…1] 
+      Successfully uninstalled exaManagementSystem
+     ~/EMS [master|✚ 1…1] 
     12:13 $
     
 # Utilisation
