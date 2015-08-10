@@ -37,6 +37,12 @@ import shutil
 import getopt
 import os
 import subprocess
+from subprocess import STDOUT
+try:
+    from subprocess import DEVNULL # py3k
+except ImportError:
+    import os
+    DEVNULL = open(os.devnull, 'wb')
 import time
 from utils import Utils, ZipUtils, LaTeX
 from utils.LaTeX import *
@@ -65,7 +71,7 @@ class ExaManagementSystem:
         smsConfig.read([join(resource_filename(__name__, 'data'), 'exam.cfg'), "exam.cfg"])
         #Read the config options
         self.__smscExamOutputDir = smsConfig.get("Config", "examOutputDir")
-        self.__smscremoveUnzipped = smsConfig.getboolean("Config", "removeUnzipped")
+        self.__doZipGeneratedFiles = smsConfig.getboolean("Config", "createZippedVersion")
         self.__smscupdateBibTex = smsConfig.getboolean("Config", "updateBibTex")
         self.__smscopencmd = smsConfig.get("Config", "opencmd")
         self.__smcsdebuglevel = smsConfig.getint("Config", "debugLevel")
@@ -162,6 +168,11 @@ class ExaManagementSystem:
         outputDir=os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'donne')
         for lang in self.__languages:
             self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False)
+
+        if self.__usepdftk:
+            subprocess.call(["pdftk "+outputDir+"/*.pdf cat output "+outputDir+"/exam"+self.__exam+".pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+        else:
+            subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=exam.pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
 
         outputDir =  os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'solution')
         self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
@@ -334,7 +345,7 @@ class ExaManagementSystem:
         print ('    -e for specifying an exercise')
         print ('    -s for specifying a particular exam')
         print ('    -u for updating/or not last visited date in bibtex')
-        print ('    -k for keeping/or not unzipped files')
+        print ('    -z for zipping the generated files')
         print ('    -t for keeping temporary files in /tmp')
         print ('    -l lecture name')
         print ('\033[1;33mWhere command is one of:\033[0m')
@@ -353,7 +364,7 @@ class ExaManagementSystem:
             self.usage()
             sys.exit(3)
         try:
-            options, args = getopt.getopt(argv, "e:s:huktl:", ["make-new-exercise", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-exercise", "preview-solution", "make-new-lecture", "--help"])
+            options, args = getopt.getopt(argv, "e:s:huztl:", ["make-new-exercise", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-exercise", "preview-solution", "make-new-lecture", "--help"])
         except getopt.GetoptError:
             self.usage()
             sys.exit(2)
@@ -376,12 +387,9 @@ class ExaManagementSystem:
                 else:
                     self.__log.info("Updating Bibtex Last visited date")
                     self.__smscupdateBibTex=True
-            if option in ["-k"]:
-                if self.__smscremoveUnzipped:
-                    self.__smscremoveUnzipped = False
-                else:
-                    self.__log.info("Keeping unzipped files")
-                    self.__smscremoveUnzipped = True
+            if option in ["-z"]:
+                self.__doZipGeneratedFiles = True
+                self.__log.info("Zipping files")
             if option in ["-t"]:
                 self.__keepTempFiles = True
             if option in ["-l"]:
@@ -399,16 +407,16 @@ class ExaManagementSystem:
                 self.__log.info("Building Exam %s", self.__exam)
                 self.doBuildExam()
                 self.__log.info("Zipping "+self.__smscExamOutputDir+str(self.__exam)+" into "+self.__smscExamOutputDir+str(self.__exam)+'.zip')
-                ZipUtils.myZip(self.__smscExamOutputDir+str(self.__exam), self.__smscExamOutputDir+str(self.__exam)+'.zip', self.__smscExamOutputDir+str(self.__exam))
-                if self.__smscremoveUnzipped:
+                if self.__doZipGeneratedFiles:
+                    ZipUtils.myZip(self.__smscExamOutputDir+str(self.__exam), self.__smscExamOutputDir+str(self.__exam)+'.zip', self.__smscExamOutputDir+str(self.__exam))
                     shutil.rmtree(self.__smscExamOutputDir+str(self.__exam))
                 break
             elif option in ["--build-all-exams"]:
                 self.__log.info("Building All Available Exams")
                 self.doBuildAllExams()
                 self.__log.info("Zipping "+self.__smscExamOutputDir+" into "+self.__smscExamOutputDir+'.zip')
-                ZipUtils.myZip(self.__smscExamOutputDir, self.__smscExamOutputDir+'.zip', self.__smscExamOutputDir)
-                if self.__smscremoveUnzipped:
+                if self.__doZipGeneratedFiles:
+                    ZipUtils.myZip(self.__smscExamOutputDir, self.__smscExamOutputDir+'.zip', self.__smscExamOutputDir)
                     shutil.rmtree(self.__smscExamOutputDir)
                 break
             elif option in ["--make-workbook"]:
