@@ -1,0 +1,127 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{sms}
+%\RequirePackage[german,french]{babel}
+\RequirePackage{paralist}
+\RequirePackage{epsfig}
+\RequirePackage{tikz}
+\RequirePackage{graphicx}
+\RequirePackage{multirow}
+\RequirePackage{hhline}
+\RequirePackage{palatino}
+%\RequirePackage{fancyheadings}
+\RequirePackage{fancyhdr}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+%\RequirePackageWithOptions{babel}
+
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{ae, pslatex}	% Joli output en PDF
+\RequirePackage{amsmath}
+\RequirePackage{amsfonts}		% Extension AMS (définie les commandes \frak et \Bbb et installe les fonts msam, msbm, eufm, cmmib et cmbsy)
+\RequirePackage{amssymb}            % Extension AMS (symboles mathématiques pas disponibles dans TeX/LaTeX)
+\RequirePackage{amsthm}             % Extension AMS (version ameliorée pour la commande \newtheorem)
+\RequirePackage{array}              % end les options des environnements ARRAY et TABULAR.
+\RequirePackage{color}              % Permet l'utilisation des couleurs.
+\RequirePackage{colortbl}		% Permet l'utilisation des couleurs dans les tableaux.
+\RequirePackage{xcolor}
+%%\RequirePackage{draftwatermark} % Imprime 'DRAFT' ('BRUILLON') en fond de la page.
+%%\RequirePackage{endnotes}          % Renvoie les notes en fin de document.
+%%\RequirePackage{graphics}          % Manipulation de boîtes et importation de graphismes.
+%%\RequirePackage[dvips]{graphicx}   %
+\RequirePackage{supertabular}
+\RequirePackage[T1]{fontenc}
+
+\RequirePackage{latexsym}           % Définit nombreux symboles mathé,atiques.
+\RequirePackage{enumerate}
+\RequirePackage{xcolor}
+\RequirePackage{tabularx}
+\RequirePackage{lastpage}
+
+\RequirePackage{listings}
+\RequirePackage[pdftex=true,pdfpagelabels,linkbordercolor=white,colorlinks=true,urlcolor=blue]{hyperref}
+%-------------- FONT DEFINITIONS ----------------
+% Choose the font you want like this: \usefont{encoding}{family}{series}{shape}
+\newcommand{\courrier}{\fontfamily{pcr}\selectfont}
+\newcommand{\helv}{\fontfamily{phv}\selectfont}
+\newcommand{\helvbold}{\fontfamily{phv}\fontseries{b}\selectfont}
+%\newcommand{\helv}{\fontfamily{phv}\fontseries{b}\fontsize{9}{11}\selectfont}
+%\newcommand{\helv}{\fontfamily{phv}}\selectfont}
+\newcommand{\palatino}{\fontfamily{ppl}\selectfont}
+\newcommand{\cmdunhill}{\usefont{OT1}{cmdh}{m}{n}} % computer modern dunhill
+%\DeclareGraphicsRule{.jpg}{eps}{}{`jpeg2ps #1}
+% Here we define and configure the listings environment
+\definecolor{listinggray}{gray}{0.9999}
+\definecolor{listingyellow}{rgb}{1,1,0.9}
+\definecolor{commentgreen}{rgb}{0,0.7,0} 
+
+\lstset {
+showstringspaces=false,
+%frame=shadowbox,
+extendedchars=true,
+basicstyle=\normalfont\helv\scriptsize,
+numbers=left,
+numberstyle=\tiny,
+numbersep=5pt,
+stepnumber=2,
+language=Java,
+breaklines,
+tabsize=2,
+backgroundcolor=\color{listingyellow},
+rulecolor=\color{blue},
+rulesepcolor=\color{black},
+linewidth=\linewidth,
+keywordstyle=\bfseries\color{blue},
+commentstyle=\color{commentgreen},
+captionpos=b,
+abovecaptionskip=\medskipamount,
+belowcaptionskip=\medskipamount,
+escapeinside={(*@}{@*)},
+}
+
+
+% Page setup: margins...
+\addtolength{\textheight}{2.15cm}
+\addtolength{\topmargin}{-2.15cm}
+\addtolength{\textwidth}{5cm}
+\addtolength{\evensidemargin}{-2.5cm}
+\addtolength{\oddsidemargin}{-2.5cm}
+\addtolength{\headheight}{35pt}
+\addtolength{\footskip}{0.4cm}
+%\setlength{\headrulewidth}{1pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+
+% Redefining Section
+ \makeatletter
+ \renewcommand{\section}{\@startsection{section}{1}{0pt}{12pt}{1pt}{\sffamily \bfseries}}
+ \renewcommand{\thesection}{(\arabic{section})}
+ %\newcommand{\none}{\hspace{0.1pt}}
+ \renewcommand{\subsection}{\@startsection{subsection}{2}{0pt}{10pt}{1pt}{\small \bfseries \itshape}}
+ \renewcommand{\thesubsection}{\Alph{subsection}}
+ \newcommand{\none}{\hspace{0.1pt}}
+
+
+
+% Redefining enumerate
+\renewcommand*\theenumi{\alph{enumi}}
+\renewcommand*\labelenumi{(\theenumi)}
+
+% \makeatletter
+% \renewcommand{\section}{\@startsection{section}{1}{0pt}{12pt}{1pt}{\sffamily \bfseries}}
+% \renewcommand{\thesection}{\arabic{section})}
+% \renewcommand{\none}{\hspace{0.1pt}}
+
+% Gray boxes
+\definecolor{MyGray}{rgb}{0.96,0.97,0.98}
+\makeatletter\newenvironment{graybox}{%
+   \begin{lrbox}{\@tempboxa}\begin{minipage}{\columnwidth}}{\end{minipage}\end{lrbox}%
+   \colorbox{MyGray}{\usebox{\@tempboxa}}
+}\makeatother
+
+% German and french translations
+
+
+
+
+

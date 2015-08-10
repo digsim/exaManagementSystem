@@ -345,7 +345,7 @@ class ExaManagementSystem:
             self.__doCreateExam([], [str(self.__exercise)],  "/tmp", time.strftime("%d.%m.%Y")+" --- 14h00 / PEII --- G120", "20,30,50,50", lang, True)
         
         if self.__usepdftk:
-            subprocess.call(["pdftk "+"/tmp/exam-*-1.pdf cat output /tmp/exam.pdf"], shell=True, cwd="./", stdout=open("/dev/stdout", 'w'))
+            subprocess.call(["pdftk "+"/tmp/exam-*.pdf cat output /tmp/exam.pdf"], shell=True, cwd="./", stdout=open("/dev/stdout", 'w'))
         else:
             subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=/tmp/exam.pdf "+"/tmp/exam-*.pdf"], shell=True, cwd="./", stdout=open("/dev/stdout", 'w'))
         if self.__smscopencmd.find(",") == -1:
@@ -425,6 +425,7 @@ class ExaManagementSystem:
         Utils.cleanDSStore("./")
         Utils.doCheckInstall()
         Utils.cleanTempFiles(True)
+        lecturename = ''
         self.__log.debug("Parsing options")
         for option, arg in options:
             self.__log.debug("Passed options are  %s  and args are %s", option, arg)
@@ -496,6 +497,8 @@ class ExaManagementSystem:
                 self.__doPreviewSolution()
                 break
             elif option in ["--make-new-lecture"]:
+                if lecturename == '':
+                    lecturename = raw_input ("Provide a name for the lecture: ")
                 self.__doCreateNewLecture(lecturename)
             elif option in ["--help", "-h"]:
                 self.usage()
