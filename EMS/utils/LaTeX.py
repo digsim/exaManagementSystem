@@ -27,12 +27,31 @@
 ################################################################################################################
 
 import logging
+import ConfigParser
+import time
+import os
 
 
 class LaTeX:
     
-    def __init__(self, lecturer, lecture, exercisetext, solutiontext, unilogo, grouplogo, pdftitle, pdfauthor, pdfkeyword, nociteList, language):
+    def __init__(self, examConfig, lecturer, lecture, exercisetext, solutiontext, unilogo, grouplogo, pdftitle, pdfauthor, pdfkeyword, nociteList, language):
         """initialization stuff"""
+
+
+        self.__date = time.strftime("%d.%m.%Y")+" --- 14h00 / PEII --- G120"
+        self.__percentages = '30, 30,30'
+        self.__semester = "Autumn"
+        self.__numbers = '1,2,3'
+        self.__titles = 'Thérie,Pattern,SimJ'
+        if os.path.isfile(examConfig):
+            seriesConfig = ConfigParser.SafeConfigParser()
+            seriesConfig.read(examConfig)
+            self.__titles = seriesConfig.get('Exam', 'titles')
+            self.__numbers = seriesConfig.get('Exam', 'exo-numbers')
+            self.__semester = seriesConfig.get('Exam', 'semester')
+            self.__date = seriesConfig.get('Exam', 'date')
+            self.__percentages = seriesConfig.get('Exam', 'percentage')
+
         self.__lecturer = lecturer
         self.__lecturename = lecture
         self.__exercisetext = exercisetext
@@ -47,7 +66,7 @@ class LaTeX:
         self.__log = logging.getLogger('exaManagementSystem')
 
 
-    def createHeader(self, file, titles, date, percentages, isSolution):
+    def createHeader(self, file, isSolution):
         if isSolution:
             file.write(r'\documentclass['+self.__language+',a4paper,12pt]{solution}'+"\n")
         else:
@@ -56,7 +75,7 @@ class LaTeX:
         file.write(r'\newcommand{\prof}{'+self.__lecturer+'}'+"\n")
         file.write(r'\newcommand{\course}{'+self.__lecturename+'}'+"\n")
         
-        file.write(r'\newcommand{\theyear}{'+date+'}'+"\n")
+        file.write(r'\newcommand{\theyear}{'+self.__date+'}'+"\n")
         file.write(r'\newcommand{\exercisetext}{'+self.__exercisetext+'}'+"\n")
         
         file.write(r'\newcommand{\solutiontext}{'+self.__solutiontext+'}'+"\n")
@@ -72,7 +91,7 @@ class LaTeX:
             per = ""
             counter = 1
             totalper = 0
-            for percentage in percentages.split(','):
+            for percentage in self.__percentages.split(','):
                 per += r"&&\\"+"\n"
                 per += ""+str(counter)+" & ......... & "+str(percentage)+r"\\"+"\n"
                 counter += 1
@@ -88,4 +107,39 @@ class LaTeX:
         for bib in self.__nociteList:
             file.write(r'\nocite{'+bib+'}\n')
         file.write(r'\end{document}'+'\n')
+
+    def makeWorkBookTitlePageHeader(self, _file):
+        _file.write(r"\documentclass[francais,a4paper]{article}"+"\n")
+        _file.write(r"\newcommand{\compilationpath}{./}"+"\n")
+        _file.write(r'\newcommand{\groupelogo}{'+self.__grouplogo+'}'+"\n")
+        _file.write(r"\usepackage{graphicx}"+"\n")
+        _file.write(r"\usepackage{palatino}"+"\n")
+        _file.write(r"%\usepackage[french]{babel}"+"\n")
+        _file.write(r"\usepackage[utf8]{inputenc}"+"\n")
+        _file.write(r"\usepackage{ae, pslatex}    % Joli output en PDF"+"\n")
+        _file.write(r"%\usepackage{graphics}          % Manipulation de boîtes et importation de graphismes."+"\n")
+        _file.write(r"%\usepackage[dvips]{graphicx}   %"+"\n")
+        _file.write(r"\usepackage[T1]{fontenc}"+"\n")
+        _file.write(r"\begin{document}"+"\n")
+        _file.write(r"\pagestyle{empty}"+"\n")
+        _file.write(r"\vspace{-1cm}"+"\n")
+        _file.write(r"\begin{center}"+"\n")
+        _file.write(r"\begin{Huge}"+"\n")
+        _file.write(r"{\sf "+self.__exercisetext+" }"+"\n")
+        _file.write(r"\end{Huge}"+"\n")
+        _file.write(r"\vspace{0.4cm}%"+"\n")
+        _file.write(r"\begin{huge}"+"\n")
+        _file.write(r"Workbook ("+self.__date+")"+"\n")
+        _file.write(r"\end{huge}"+"\n")
+        _file.write(r"\end{center}"+"\n")
+        _file.write(r"\rule{\linewidth}{1pt}"+"\n")
+        _file.write(r"\vspace{1cm}"+"\n")
+
+    def printWorkBookTitlePageFooter(self, _file):
+        _file.write(r"%\end{itemize}"+"\n")
+        _file.write(r"\rule{\linewidth}{1pt}"+"\n")
+        _file.write(r"\vfill"+"\n")
+        _file.write(r"\centering"+"\n")
+        _file.write(r"\includegraphics[height=1.65cm]{\compilationpath/logos/\groupelogo}"+"\n")
+        _file.write(r"\end{document}"+"\n")
         

@@ -112,7 +112,7 @@ class ExaManagementSystem:
             self.__languages[lang] = smsConfig.get('Language', lang)
         
         
-        self.__exam = -1
+        self.__exam = ''
         self.__exercise = -1
         self.__log.setLevel(self.__smcsdebuglevel)
         
@@ -172,7 +172,7 @@ class ExaManagementSystem:
         if self.__usepdftk:
             subprocess.call(["pdftk "+outputDir+"/*.pdf cat output "+outputDir+"/exam"+self.__exam+".pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
         else:
-            subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=exam.pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+            subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="+outputDir+"exam.pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
 
         outputDir =  os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'solution')
         self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
@@ -181,8 +181,8 @@ class ExaManagementSystem:
     def __doCreateExam(self, titles, numbers, outputDir, date, percentages, language, doPreview):
         texfile = "/tmp/exam-"+language+str(self.__exam)+".tex"
         serie = open(texfile, 'w')
-        latex = LaTeX(self.__smsclecturer, self.__smscname, self.__languages[language], 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, language)
-        latex.createHeader(serie, titles, date, percentages, doPreview)
+        latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, self.__languages[language], 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, language)
+        latex.createHeader(serie,  doPreview)
 
         for number in numbers:
             serie.write(r"\newpage"+"\n")
@@ -200,8 +200,8 @@ class ExaManagementSystem:
     def __doCreateSolution(self, titles, numbers, outputDir, date, percentages):
         texfile = "/tmp/solution"+str(self.__exam)+".tex"
         solution = open(texfile, 'w')
-        latex = LaTeX(self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
-        latex.createHeader(solution, titles, date, percentages, True)
+        latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
+        latex.createHeader(solution, True)
 
         for number in numbers:
             solution.write(r"\newpage"+"\n")
@@ -228,16 +228,71 @@ class ExaManagementSystem:
         for config in examConfigFiles:
             if not config.startswith("."):
                 self.__log.debug("Will treat from file: "+config)#+" serie:"+config.split(".")[0].partition("serie")[2])
-                #self.__serie=int(config.split(".")[0].partition("serie")[2])
-                #self.__log.info("Found Serie "+str(self.__serie)+". Will now build it.")
+                #self.__exam=int(config.split(".")[0].partition("serie")[2])
+                #self.__log.info("Found Serie "+str(self.__exam)+". Will now build it.")
                 self.__exam=config.split("exam")[1].partition(".")[0]
                 self.__log.info("Found Exam "+self.__exam+". Will now build it.")
                 self.doBuildExam()
                 
     def doMakeWorkbook(self):
         """Creates on big pdf containig all passed exams"""
-        self.__log.error("Workbook funktionality is not yet implemented")
-        return -2
+        examConfigFiles = os.listdir(self.__examProperties)
+        #seriesConfigFiles.sort()
+        examConfigFiles = Utils.natsort(examConfigFiles)
+        if os.path.isdir(self.__smscExamOutputDir):
+            shutil.rmtree(self.__smscExamOutputDir)
+        os.mkdir(self.__smscExamOutputDir)
+        self.__outputDir = self.__smscExamOutputDir
+        for config in examConfigFiles:
+            self.__exam=config.split(".")[0].partition("exam")[2]
+            self.__log.info("Found Exam "+str(self.__exam)+". Will now build it.")
+            seriesConfig = ConfigParser.SafeConfigParser()
+            self.__log.debug("Reading "+self.__examProperties+"/exam"+str(self.__exam)+".cfg")
+            seriesConfig.read(self.__examProperties+"/"+config)
+            titles = seriesConfig.get('Exam', 'titles')
+            numbers = seriesConfig.get('Exam', 'exo-numbers')
+            date = seriesConfig.get('Exam', 'date')
+            percentages = seriesConfig.get('Exam', 'percentage')
+            outputDir=self.__smscExamOutputDir
+            for lang in self.__languages:
+                self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False)
+            outputDir =  self.__smscExamOutputDir
+            self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
+
+        self.__makeWorkBookTitlePage(outputDir)
+        if self.__usepdftk:
+            subprocess.call(["pdftk "+outputDir+"/*.pdf cat output workbook.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+        else:
+            subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=workbook.pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+        shutil.rmtree(self.__smscExamOutputDir)
+        Utils.cleanTempFiles([])
+
+
+    def __makeWorkBookTitlePage(self, _outputDir):
+        texfile = "/tmp/0wbtitlepage.tex"
+        wbtitle = open(texfile, 'w')
+        latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg",self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
+        latex.makeWorkBookTitlePageHeader(wbtitle)
+        examConfigFiles = os.listdir(self.__examProperties)
+        examConfigFiles = Utils.natsort(examConfigFiles)
+        for config in examConfigFiles:
+            seriesConfig = ConfigParser.SafeConfigParser()
+            seriesConfig.read(self.__examProperties+"/"+config)
+            titles = seriesConfig.get('Exam', 'titles')
+            numbers = seriesConfig.get('Exam', 'exo-numbers')
+            date = seriesConfig.get('Exam', 'date')
+            percentages = seriesConfig.get('Exam', 'percentage')
+            examnumber = config.split(".")[0].partition("exam")[2]
+            wbtitle.write(r"\textsf{ \textbf{Exam "+examnumber+"}} \dotfill"+"\n")
+            for number in numbers.split(","):
+                wbtitle.write(number+"\n")
+            wbtitle.write(r"\begin{itemize}"+"\n")
+            for title in titles.split(","):
+                wbtitle.write(r"\item "+title+"\n")
+            wbtitle.write(r"\end{itemize}"+"\n")
+        latex.printWorkBookTitlePageFooter(wbtitle)
+        wbtitle.close()
+        Utils.doLatex(texfile, _outputDir, True)
         
     def doMakeCatalogue(self):
         """Creates on big pdf containing all available exercises"""
@@ -247,8 +302,8 @@ class ExaManagementSystem:
         os.mkdir(outputDir)
         file = "/tmp/catalog.tex"
         catalog = open(file, 'w')
-        latex = LaTeX(self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
-        latex.createHeader(catalog, '', '', '', True)
+        latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
+        latex.createHeader(catalog, True)
         catalog.write(r'\renewcommand{\exercice}[1]{\subsection*{Problem: #1}}'+"\n")
         catalog.write(r'\renewcommand{\solution}[1]{\subsection*{Solution: #1}}'+"\n")
         catalog.write(r'\renewcommand{\question}[1]{\subsubsection*{#1}}'+"\n")
@@ -287,7 +342,7 @@ class ExaManagementSystem:
     def __doPreviewExam(self):
         """Generate a quick preview (pdf) of one exercise"""
         for lang in self.__languages:
-            self. __doCreateExam([], [str(self.__exercise)],  "/tmp", time.strftime("%d.%m.%Y")+" --- 14h00 / PEII --- G120", "20,30,50,50", lang, True)
+            self.__doCreateExam([], [str(self.__exercise)],  "/tmp", time.strftime("%d.%m.%Y")+" --- 14h00 / PEII --- G120", "20,30,50,50", lang, True)
         
         if self.__usepdftk:
             subprocess.call(["pdftk "+"/tmp/exam-*-1.pdf cat output /tmp/exam.pdf"], shell=True, cwd="./", stdout=open("/dev/stdout", 'w'))
@@ -305,18 +360,17 @@ class ExaManagementSystem:
         
     def __doPreviewSolution(self):
         """Generates a quick preview (pdf) of the solution of one exercise"""
-        self.__exam = 0
         
         self. __doCreateSolution([], [str(self.__exercise)], "/tmp", time.strftime("%d.%m.%Y")+" --- 14h00 / PEII --- G120", "20,30,50,50")
         if self.__smscopencmd.find(",") == -1:
             cmd = self.__smscopencmd
-            arg = [cmd, "/tmp/solution0.pdf"]
+            arg = [cmd, "/tmp/solution.pdf"]
         else:
             cmd = self.__smscopencmd.split(",")[0]
             arg = self.__smscopencmd.split(",")[1:]
-            arg.append("/tmp/solution0.pdf")
+            arg.append("/tmp/solution.pdf")
             arg.insert(0, cmd)
-        subprocess.Popen(cmd+" /tmp/solution0.pdf", shell=True)
+        subprocess.Popen(cmd+" /tmp/solution.pdf", shell=True)
 
     def __doCreateNewLecture(self, lecturename):
         """Create the directory structure for a new lecture"""
@@ -402,8 +456,8 @@ class ExaManagementSystem:
                 self.doCreateNewExercise()
                 break
             elif option in ["--build-exam"]:
-                if self.__exam == -1:
-                    self.__exam = int(raw_input ("Which exam do you want to build? "))
+                if self.__exam == '':
+                    self.__exam = raw_input ("Which exam do you want to build? ")
                 self.__log.info("Building Exam %s", self.__exam)
                 self.doBuildExam()
                 self.__log.info("Zipping "+self.__smscExamOutputDir+str(self.__exam)+" into "+self.__smscExamOutputDir+str(self.__exam)+'.zip')
