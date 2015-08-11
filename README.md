@@ -137,16 +137,29 @@ Each exercise is made of two folders: code containing additional material to be 
     
 Additional material to be distributed in zipped form with the series needs to be placed in a subfolder code/donnee whereas distributed material to be distributed with the solution needs to be placed in a subfolder code/solution.
 
-The exercise latex code is in a file exo[number]-[language].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo[number]-sol.tex. You can define as many exam languages as you want. Just be sure that for each used languaged suffix you create a corresponding entry in the [Language] section of _exam.cfg_ configuration. Therefore it would be possible to have another file called _exo1-english.tex_ together with a definition _english: Exam_ in the _exam.cfg_. Thus, the script would produce the exam in three languages: german, french and english. The global config file _exam.cfg_ decides which languages are produced.  
+The exercise latex code is in a file exo[number]-[language].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo[number]-sol.tex. 
 
-Resources used for the latex code are stored in a subfolder resources. This folder contains a folder, figures to store images which are included with
+You can define as many exam languages as you want. Just be sure that for each used languaged suffix:
+* there is a corresponding entry in the [Language] section of _exam.cfg_ configuration 
+* there exist a _exam-[language].cls_ defining the first page of the exam in the corresponding language.
+Therefore it would be possible to have another file called _exo1-english.tex_ and a file _exam-english.cls_ together with a definition _english: Exam_ in the _exam.cfg_. Thus, the script would produce the exam in three languages: german, french and english. The global config file _exam.cfg_ decides which languages are produced.  
+
+The layout of the titleage can be adapted by modifying the _exam-[language].cls_ files. Following keys need to be defined:
+* the layout of the points (per exercise / total) can be modified by changing the _donepoints_ variable.
+* _indications_ contains general indications (No books, no smart-phone etc.).
+* _exampreamble_ puts together the _indications_, date, university/course header and _donepoints_.
+* _studentheader_ contains the header where students put their names etc.
+
+
+Resources used for the latex code are stored in a subfolder _resources_. This folder contains two sub-folders; one for figures to store images which are included with
 
     \includegraphics[height=7cm]{\compilationpath/Exercices/ex3/latex/resources/figures/inherit.png}
     
+and one to store listings to be included in the LaTeX code.
 
     
 
-By default the properties for a serie are stored in the folder Exam_properties. A typical config file looks like:
+By default the properties for an exam are stored in the folder Exam_properties. A typical config file looks like:
 
     [Exam]
     titles: Pattern, Théorie, SimJ
