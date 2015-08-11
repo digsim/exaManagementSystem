@@ -144,7 +144,7 @@ You can define as many exam languages as you want. Just be sure that for each us
 * there exist a _exam-[language].cls_ defining the first page of the exam in the corresponding language.
 Therefore it would be possible to have another file called _exo1-english.tex_ and a file _exam-english.cls_ together with a definition _english: Exam_ in the _exam.cfg_. Thus, the script would produce the exam in three languages: german, french and english. The global config file _exam.cfg_ decides which languages are produced.  
 
-The layout of the titleage can be adapted by modifying the _exam-[language].cls_ files. Following keys need to be defined:
+The layout of the titlepage can be adapted by modifying the _exam-[language].cls_ files. Following keys need to be defined:
 * the layout of the points (per exercise / total) can be modified by changing the _donepoints_ variable.
 * _indications_ contains general indications (No books, no smart-phone etc.).
 * _exampreamble_ puts together the _indications_, date, university/course header and _donepoints_.
@@ -168,7 +168,7 @@ By default the properties for an exam are stored in the folder Exam_properties. 
     percentage: 30,35,25
     date: 9.6.2015 - 14h / PEII --- C120
 
-It contains only one section: Exam with five keys:
+It contains only one section: _Exam_ with five keys:
 * The titles key defines the topics of the serie and is a comma separated list. In the final document this will produce an itemize in the serie header. 
 * The exo-number defines which exercices are selected for this exam. The number references the last (numbered) part of one exercise folder.
 * The semester will print the according semester on the first page of the exam.
