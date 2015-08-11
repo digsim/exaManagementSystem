@@ -137,7 +137,7 @@ Each exercise is made of two folders: code containing additional material to be 
     
 Additional material to be distributed in zipped form with the series needs to be placed in a subfolder code/donnee whereas distributed material to be distributed with the solution needs to be placed in a subfolder code/solution.
 
-The exercise latex code is in a file ex[number].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo[number]sol.tex. 
+The exercise latex code is in a file exo[number]-[language].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo[number]-sol.tex. You can define as many exam languages as you want. Just be sure that for each used languaged suffix you create a corresponding entry in the [Language] section of _exam.cfg_ configuration. Therefore it would be possible to have another file called _exo1-english.tex_ together with a definition _english: Exam_ in the _exam.cfg_. Thus, the script would produce the exam in three languages: german, french and english. The global config file _exam.cfg_ decides which languages are produced.  
 
 Resources used for the latex code are stored in a subfolder resources. This folder contains a folder, figures to store images which are included with
 
