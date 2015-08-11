@@ -72,6 +72,7 @@ class ExaManagementSystem:
         #Read the config options
         self.__smscExamOutputDir = smsConfig.get("Config", "examOutputDir")
         self.__doZipGeneratedFiles = smsConfig.getboolean("Config", "createZippedVersion")
+        self.__createIndividualExams = smsConfig.getboolean("Config", "createIndividualExam")
         self.__smscupdateBibTex = smsConfig.getboolean("Config", "updateBibTex")
         self.__smscopencmd = smsConfig.get("Config", "opencmd")
         self.__smcsdebuglevel = smsConfig.getint("Config", "debugLevel")
@@ -156,30 +157,34 @@ class ExaManagementSystem:
         semester = seriesConfig.get('Exam', 'semester')
         date = seriesConfig.get('Exam', 'date')
         percentages = seriesConfig.get('Exam', 'percentage')
-        
+        outputDir=os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam))
         
         # check if dir exists with os.path.isdir
         if os.path.isdir(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam))):
             shutil.rmtree(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)))
         os.mkdir(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)))
-        os.mkdir(os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'donne'))
-        os.mkdir(os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'solution'))
+        if self.__createIndividualExams:
+            os.mkdir(os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'exam'))
+            outputDir=os.path.join(outputDir, 'exam')
 
-        outputDir=os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'donne')
+        individualPDFs = []
         for lang in self.__languages:
-            self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False)
+            individualPDFs.append(self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False))
+        if not self.__createIndividualExams:
+            if self.__usepdftk:
+                subprocess.call(["pdftk "+outputDir+"/*.pdf cat output "+outputDir+"/exam"+self.__exam+".pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+            else:
+                subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="+outputDir+"/exam"+self.__exam+".pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
+            for pdf in individualPDFs:
+                os.remove(pdf)
 
-        if self.__usepdftk:
-            subprocess.call(["pdftk "+outputDir+"/*.pdf cat output "+outputDir+"/exam"+self.__exam+".pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
-        else:
-            subprocess.call(["gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile="+outputDir+"exam.pdf "+outputDir+"/*.pdf"], shell=True, cwd="./", stdout=DEVNULL, stderr=STDOUT)
-
-        outputDir =  os.path.join(os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam)),'solution')
+        outputDir=os.path.join(self.__outputDir, self.__smscExamOutputDir+str(self.__exam))
         self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
 
         
     def __doCreateExam(self, titles, numbers, outputDir, date, percentages, language, doPreview):
-        texfile = "/tmp/exam-"+language+str(self.__exam)+".tex"
+        filename = "exam-"+language+str(self.__exam)
+        texfile = os.path.join("/tmp/", filename+".tex")
         serie = open(texfile, 'w')
         latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, self.__languages[language], 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, language)
         latex.createHeader(serie,  doPreview)
@@ -195,10 +200,12 @@ class ExaManagementSystem:
         serie.close()
 
         Utils.doLatex(texfile, outputDir)
+        return os.path.join(outputDir, filename+".pdf")
 
 
     def __doCreateSolution(self, titles, numbers, outputDir, date, percentages):
-        texfile = "/tmp/solution"+str(self.__exam)+".tex"
+        filename = "solution"+str(self.__exam)
+        texfile = os.path.join("/tmp/", filename+".tex")
         solution = open(texfile, 'w')
         latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
         latex.createHeader(solution, True)
@@ -214,6 +221,7 @@ class ExaManagementSystem:
         solution.close()
 
         Utils.doLatex(texfile, outputDir)
+        return os.path.join(outputDir, filename+".pdf")
         
         
     def doBuildAllExams(self):
