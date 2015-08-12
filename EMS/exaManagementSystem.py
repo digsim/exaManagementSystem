@@ -182,8 +182,8 @@ class ExaManagementSystem:
         self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
 
         
-    def __doCreateExam(self, titles, numbers, outputDir, date, percentages, language, doPreview):
-        filename = "exam-"+language+str(self.__exam)
+    def __doCreateExam(self, titles, numbers, outputDir, date, percentages, language, doPreview, filename = None):
+        filename = filename or "exam-"+language+str(self.__exam)
         texfile = os.path.join("/tmp/", filename+".tex")
         serie = open(texfile, 'w')
         latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, self.__languages[language], 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, language)
@@ -203,8 +203,8 @@ class ExaManagementSystem:
         return os.path.join(outputDir, filename+".pdf")
 
 
-    def __doCreateSolution(self, titles, numbers, outputDir, date, percentages):
-        filename = "solution"+str(self.__exam)
+    def __doCreateSolution(self, titles, numbers, outputDir, date, percentages, filename = None):
+        filename = filename or "solution"+str(self.__exam)
         texfile = os.path.join("/tmp/", filename+".tex")
         solution = open(texfile, 'w')
         latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
@@ -263,9 +263,11 @@ class ExaManagementSystem:
             percentages = seriesConfig.get('Exam', 'percentage')
             outputDir=self.__smscExamOutputDir
             for lang in self.__languages:
-                self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False)
+                examName = str(self.__exam)+"-"+lang
+                examName = self.__doCreateExam(titles.split(','), numbers.split(','), outputDir, date, percentages, lang, False, examName)
             outputDir =  self.__smscExamOutputDir
-            self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages)
+            solutionname = str(self.__exam)+"-solution"
+            solutionname = self.__doCreateSolution(titles.split(','), numbers.split(','), outputDir, date, percentages, solutionname)
 
         self.__makeWorkBookTitlePage(outputDir)
         if self.__usepdftk:
