@@ -115,9 +115,9 @@ By default the folder containing all exercises is Exercices. For the system to w
     
     Exercices/ex1/latex:
     total 32
-    -rw-r--r--  1 ruppena  staff   711B May 28 08:07 exo1-french.tex
-    -rw-r--r--  1 ruppena  staff   774B May 28 08:07 exo1-german.tex
-    -rw-r--r--  1 ruppena  staff   4.2K May 28 08:07 exo1-solution.tex
+    -rw-r--r--  1 ruppena  staff   711B May 28 08:07 exo-french.tex
+    -rw-r--r--  1 ruppena  staff   774B May 28 08:07 exo-german.tex
+    -rw-r--r--  1 ruppena  staff   4.2K May 28 08:07 exo-solution.tex
     drwxr-xr-x  4 ruppena  staff   136B Oct  6  2014 ressources/
     
     Exercices/ex1/latex/ressources:
@@ -137,7 +137,7 @@ Each exercise is made of two folders: code containing additional material to be 
     
 Additional material to be distributed in zipped form with the series needs to be placed in a subfolder code/donnee whereas distributed material to be distributed with the solution needs to be placed in a subfolder code/solution.
 
-The exercise latex code is in a file exo[number]-[language].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo[number]-sol.tex. 
+The exercise latex code is in a file exo-[language].tex where number must be the same as used in the folder containing the exercise. The same applies for the solution, which is written in a file called exo-sol.tex. 
 
 You can define as many exam languages as you want. Just be sure that for each used languaged suffix:
 * there is a corresponding entry in the [Language] section of _exam.cfg_ configuration 

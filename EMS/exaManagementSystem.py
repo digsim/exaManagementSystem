@@ -126,7 +126,7 @@ class ExaManagementSystem:
         for directory in self.__examStructure:
             os.mkdir(self.__exerciseDir+"/"+"ex"+str(self.__exercise)+"/"+directory)
         for lang in self.__languages:
-            latexfile = open(self.__exerciseDir+"/"+"ex"+str(self.__exercise)+"/latex/exo"+str(self.__exercise)+"-"+lang+".tex", 'w')
+            latexfile = open(self.__exerciseDir+"/"+"ex"+str(self.__exercise)+"/latex/exo-"+lang+".tex", 'w')
             latexfile.write("\exercice{}\n")
             latexfile.write("Put some text here\n")
             latexfile.write("%%% Local Variables:\n")
@@ -135,7 +135,7 @@ class ExaManagementSystem:
             latexfile.write('%%% ispell-local-dictionary: "fr_CH"\n')
             latexfile.write("%%% End:\n")
             latexfile.close
-        latexsolution = open(self.__exerciseDir+"/"+"ex"+str(self.__exercise)+"/latex/exo"+str(self.__exercise)+"-solution.tex", 'w')
+        latexsolution = open(self.__exerciseDir+"/"+"ex"+str(self.__exercise)+"/latex/exo-solution.tex", 'w')
         latexsolution.write("\exercice{}\n")
         latexsolution.write("Write down the solution\n")
         latexsolution.write("%%% Local Variables:\n")
@@ -192,7 +192,7 @@ class ExaManagementSystem:
         for number in numbers:
             serie.write(r"\newpage"+"\n")
             serie.write(r'\renewcommand{\includepath}{\compilationpath/'+self.__exerciseDir+'/ex'+number+'/latex/ressources}'+'\n')
-            exo = open(self.__exerciseDir+"/"+"ex"+number+"/latex/exo"+number+"-"+language+".tex", 'r')
+            exo = open(self.__exerciseDir+"/"+"ex"+number+"/latex/exo-"+language+".tex", 'r')
             for line in exo:
                 serie.write(line)
             serie.write(r"\clearpage"+"\n")
@@ -213,7 +213,7 @@ class ExaManagementSystem:
         for number in numbers:
             solution.write(r"\newpage"+"\n")
             solution.write(r'\renewcommand{\includepath}{\compilationpath/'+self.__exerciseDir+'/ex'+number+'/latex/ressources}'+'\n')
-            exo = open(self.__exerciseDir+"/"+"ex"+number+"/latex/exo"+number+"-solution.tex", 'r')
+            exo = open(self.__exerciseDir+"/"+"ex"+number+"/latex/exo-solution.tex", 'r')
             for line in exo:
                 solution.write(line)
 
@@ -329,13 +329,13 @@ class ExaManagementSystem:
                 catalog.write(r'\renewcommand{\includepath}{\compilationpath/'+self.__exerciseDir+'/ex'+number+'/latex/ressources}'+'\n')
                 for lang in self.__languages:
                     catalog.write(r'\renewcommand{\exercice}[1]{\subsection*{Problem '+lang+': #1}}'+"\n")
-                    exo = open(os.path.join(os.path.join(self.__exerciseDir, "ex"+number),"latex/exo"+number+"-"+lang+".tex"), 'r')
+                    exo = open(os.path.join(os.path.join(self.__exerciseDir, "ex"+number),"latex/exo-"+lang+".tex"), 'r')
                     for line in exo:
                         catalog.write(line)
                     exo.close()
                 catalog.write(r'\renewcommand{\includepath}{\compilationpath/'+self.__exerciseDir+'/ex'+number+'/latex/ressources}'+'\n')
                 catalog.write(r'\renewcommand{\exercice}[1]{\subsection*{Solution: #1}}'+"\n")
-                solution = open(os.path.join(os.path.join(self.__exerciseDir, "ex"+number),"latex/exo"+number+"-solution.tex"), 'r')
+                solution = open(os.path.join(os.path.join(self.__exerciseDir, "ex"+number),"latex/exo-solution.tex"), 'r')
                 for line in solution:
                     catalog.write(line)
                 solution.close()
