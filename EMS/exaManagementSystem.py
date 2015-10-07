@@ -307,8 +307,8 @@ class ExaManagementSystem:
         if os.path.isdir(outputDir):
             shutil.rmtree(outputDir)
         os.mkdir(outputDir)
-        file = "/tmp/catalog.tex"
-        catalog = open(file, 'w')
+        afile = "/tmp/catalog.tex"
+        catalog = open(afile, 'w')
         latex = LaTeX(self.__examProperties+"/exam"+self.__exam+".cfg", self.__smsclecturer, self.__smscname, '', 'solution', self.__smscunilogo, self.__smscgroupelogo, self.__smscpdftitle, self.__smscpdfauthor, self.__smscpdfkeyword, self.__noCiteList, 'french')
         latex.createHeader(catalog, True)
         catalog.write(r'\renewcommand{\exercice}[1]{\subsection*{Problem: #1}}'+"\n")
@@ -344,7 +344,10 @@ class ExaManagementSystem:
 
         latex.createFooter(catalog)
         catalog.close()
-        Utils.doLatex(file, outputDir)
+        Utils.doLatex(afile, outputDir)
+        basename = os.path.split(afile)[1].split(".")[0]
+        shutil.move(os.path.join(outputDir, basename+".pdf"), basename+".pdf")
+        shutil.rmtree(outputDir)
         
     def __doPreviewExam(self):
         """Generate a quick preview (pdf) of one exercise"""
