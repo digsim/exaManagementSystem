@@ -20,7 +20,7 @@ cmdclass = {'install_data': install_data}
 data_files = [('/etc/ExaManagementSystem/', ['etc/logging.conf']), ('/usr/local/etc/bash_completion.d/', ['etc/exaManagementSystem-completion.bash'])]
 package_data = {'EMS': [] + walk_subpkg('data/')}
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('requirements.txt')
+install_reqs = parse_requirements('requirements.txt', session=False)
 reqs = [str(ir.req) for ir in install_reqs]
 
 
