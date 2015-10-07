@@ -149,6 +149,7 @@ class ExaManagementSystem:
         """Builds just one exam"""
         if self.__smscupdateBibTex:
             self.__doUpdateBibTex()
+            self.adlfjadfélk()
         seriesConfig = ConfigParser.SafeConfigParser()
         self.__log.debug(self.__examProperties+"/exam"+str(self.__exam)+".cfg")
         seriesConfig.read(self.__examProperties+"/exam"+str(self.__exam)+".cfg")
@@ -404,7 +405,7 @@ class ExaManagementSystem:
     @staticmethod
     def usage():
         print ('Usage:')
-        print (os.path.basename(sys.argv[0])+' [option] <command>') #sys.argv[0]
+        print (os.path.basename(sys.argv[0])+' <command> [option]') #sys.argv[0]
         print ('\033[1;33mWhere option is one of:\033[0m')
         print ('    -e for specifying an exercise')
         print ('    -s for specifying a particular exam')
@@ -413,14 +414,14 @@ class ExaManagementSystem:
         print ('    -t for keeping temporary files in /tmp')
         print ('    -l lecture name')
         print ('\033[1;33mWhere command is one of:\033[0m')
-        print ('    make-new-exercise.........................Creates a new exercise structure')
-        print ('    build-exam (-s option mandatory)..........Builds all for the specified exam and packs it for moodle')
-        print ('    build-all-exams...........................Builds all available exams and packs them for moodle')
-        print ('    make-workbook.............................Creates one big pdf wich contains all concatenated exams')
-        print ('    make-catalogue............................Creates a pdf containing all exercices')
-        print ('    preview-exercise (-e option mandatory)....Previews the specified exercise')
-        print ('    preview-solution (-e option mandatory)....Previews the solution for the specified exercise')
-        print ('    make-new-lecture..........................Creates the directory structure for a new Lecture')
+        print ('    --make-new-exercise.........................Creates a new problem structure')
+        print ('    --build-exam (-s option mandatory)..........Builds all for the specified exam')
+        print ('    --build-all-exams...........................Builds all available exams')
+        print ('    --make-workbook.............................Creates one big PDF wich contains all concatenated exams')
+        print ('    --make-catalogue............................Creates a PDF containing all exam problems and solutions')
+        print ('    --preview-exercise (-e option mandatory)....Previews the specified problem')
+        print ('    --preview-solution (-e option mandatory)....Previews the solution for the specified problem')
+        print ('    --make-new-lecture..........................Creates the directory structure holding the exams for one lecture')
 
     def getArguments(self, argv):
         # Parse the command line options
