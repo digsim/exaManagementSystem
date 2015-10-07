@@ -73,7 +73,6 @@ class ExaManagementSystem:
         self.__smscExamOutputDir = smsConfig.get("Config", "examOutputDir")
         self.__doZipGeneratedFiles = smsConfig.getboolean("Config", "createZippedVersion")
         self.__createIndividualExams = smsConfig.getboolean("Config", "createIndividualExam")
-        self.__smscupdateBibTex = smsConfig.getboolean("Config", "updateBibTex")
         self.__smscopencmd = smsConfig.get("Config", "opencmd")
         self.__smcsdebuglevel = smsConfig.getint("Config", "debugLevel")
         self.__examProperties = smsConfig.get('Config', 'examProperties')
@@ -147,9 +146,6 @@ class ExaManagementSystem:
         
     def doBuildExam(self):
         """Builds just one exam"""
-        if self.__smscupdateBibTex:
-            self.__doUpdateBibTex()
-            self.adlfjadfélk()
         seriesConfig = ConfigParser.SafeConfigParser()
         self.__log.debug(self.__examProperties+"/exam"+str(self.__exam)+".cfg")
         seriesConfig.read(self.__examProperties+"/exam"+str(self.__exam)+".cfg")
@@ -407,21 +403,20 @@ class ExaManagementSystem:
         print ('Usage:')
         print (os.path.basename(sys.argv[0])+' <command> [option]') #sys.argv[0]
         print ('\033[1;33mWhere option is one of:\033[0m')
-        print ('    -e for specifying an exercise')
-        print ('    -s for specifying a particular exam')
-        print ('    -u for updating/or not last visited date in bibtex')
+        print ('    -e for specifying an exam')
+        print ('    -p for specifying a particular problem')
         print ('    -z for zipping the generated files')
         print ('    -t for keeping temporary files in /tmp')
         print ('    -l lecture name')
         print ('\033[1;33mWhere command is one of:\033[0m')
-        print ('    --make-new-exercise.........................Creates a new problem structure')
-        print ('    --build-exam (-s option mandatory)..........Builds all for the specified exam')
+        print ('    --make-new-problem.........................Creates a new problem structure')
+        print ('    --build-exam (-e option mandatory)..........Builds all for the specified exam')
         print ('    --build-all-exams...........................Builds all available exams')
         print ('    --make-workbook.............................Creates one big PDF wich contains all concatenated exams')
         print ('    --make-catalogue............................Creates a PDF containing all exam problems and solutions')
-        print ('    --preview-exercise (-e option mandatory)....Previews the specified problem')
-        print ('    --preview-solution (-e option mandatory)....Previews the solution for the specified problem')
-        print ('    --make-new-lecture..........................Creates the directory structure holding the exams for one lecture')
+        print ('    --preview-exercise (-p option mandatory)....Previews the specified problem')
+        print ('    --preview-solution (-p option mandatory)....Previews the solution for the specified problem')
+        print ('    --make-new-lecture (-l option mandatory)....Creates the directory structure holding the exams for one lecture')
 
     def getArguments(self, argv):
         # Parse the command line options
@@ -429,7 +424,7 @@ class ExaManagementSystem:
             self.usage()
             sys.exit(3)
         try:
-            options, args = getopt.getopt(argv, "e:s:huztl:", ["make-new-exercise", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-exercise", "preview-solution", "make-new-lecture", "--help"])
+            options, args = getopt.getopt(argv, "e:p:huztl:", ["make-new-problem", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-exercise", "preview-solution", "make-new-lecture", "--help"])
         except getopt.GetoptError:
             self.usage()
             sys.exit(2)
@@ -441,18 +436,12 @@ class ExaManagementSystem:
         for option, arg in options:
             self.__log.debug("Passed options are  %s  and args are %s", option, arg)
 
-            if option in ["-e"]:
-                self.__log.info("Current exercise is: %s", arg)
+            if option in ["-p"]:
+                self.__log.info("Current problem is: %s", arg)
                 self.__exercise=int(arg)
-            elif option in ["-s"]:
+            elif option in ["-e"]:
                 self.__log.info("Current exam is: %s", arg)
                 self.__exam=arg
-            if option in ["-u"]:
-                if self.__smscupdateBibTex:
-                    self.__smscupdateBibTex=False
-                else:
-                    self.__log.info("Updating Bibtex Last visited date")
-                    self.__smscupdateBibTex=True
             if option in ["-z"]:
                 self.__doZipGeneratedFiles = True
                 self.__log.info("Zipping files")
@@ -463,8 +452,8 @@ class ExaManagementSystem:
         self.__log.debug("Parsing arguments")
         for option, arg in options:
             self.__log.debug("Passed options are  \"%s\"  and args are \"%s\"", option, arg)
-            if option in ["--make-new-exercise"]:
-                self.__log.info("Creating a new Exercice")
+            if option in ["--make-new-problem"]:
+                self.__log.info("Creating a new Problem")
                 self.doCreateNewExercise()
                 break
             elif option in ["--build-exam"]:
@@ -490,13 +479,13 @@ class ExaManagementSystem:
                 self.doMakeWorkbook()
                 break
             elif option in ["--make-catalogue"]:
-                self.__log.info("Creating Catalogue of available Exercices")
+                self.__log.info("Creating Catalogue of available Problems")
                 self.doMakeCatalogue()
                 break
             elif option in ["--preview-exercise"]:
                 if self.__exercise == -1:
-                    self.__exercise = int(raw_input ("Which exercise do you want to preview? "))
-                self.__log.info("Previewing exercise %s", self.__exercise)
+                    self.__exercise = int(raw_input ("Which problem do you want to preview? "))
+                self.__log.info("Previewing problem %s", self.__exercise)
                 self.__keepTempFiles = True
                 self.__doPreviewExam()
                 break
