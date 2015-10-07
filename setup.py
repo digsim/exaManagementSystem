@@ -35,7 +35,7 @@ def read(fname):
 
 setup(
     name="exaManagementSystem",
-    version="1.1.15",
+    version="1.1.16",
     author="Andreas Ruppen",
     author_email="andreas.ruppen@gmail.com",
     description="Manages Series",
