@@ -417,7 +417,7 @@ class ExaManagementSystem:
         print ('    --build-all-exams...........................Builds all available exams')
         print ('    --make-workbook.............................Creates one big PDF wich contains all concatenated exams')
         print ('    --make-catalogue............................Creates a PDF containing all exam problems and solutions')
-        print ('    --preview-exercise (-p option mandatory)....Previews the specified problem')
+        print ('    --preview-problem  (-p option mandatory)....Previews the specified problem')
         print ('    --preview-solution (-p option mandatory)....Previews the solution for the specified problem')
         print ('    --make-new-lecture (-l option mandatory)....Creates the directory structure holding the exams for one lecture')
 
@@ -427,7 +427,7 @@ class ExaManagementSystem:
             self.usage()
             sys.exit(3)
         try:
-            options, args = getopt.getopt(argv, "e:p:huztl:", ["make-new-problem", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-exercise", "preview-solution", "make-new-lecture", "--help"])
+            options, args = getopt.getopt(argv, "e:p:huztl:", ["make-new-problem", "build-exam", "build-all-exams", "make-workbook", "make-catalogue", "preview-problem", "preview-solution", "make-new-lecture", "--help"])
         except getopt.GetoptError:
             self.usage()
             sys.exit(2)
@@ -485,7 +485,7 @@ class ExaManagementSystem:
                 self.__log.info("Creating Catalogue of available Problems")
                 self.doMakeCatalogue()
                 break
-            elif option in ["--preview-exercise"]:
+            elif option in ["--preview-problem"]:
                 if self.__exercise == -1:
                     self.__exercise = int(raw_input ("Which problem do you want to preview? "))
                 self.__log.info("Previewing problem %s", self.__exercise)
